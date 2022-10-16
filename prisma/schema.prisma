@@ -9,3 +9,54 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Kelas{
+  id_kelas    Int  @id @default(autoincrement())
+  tingkat     String
+  jurusan     String
+  nomor       String
+  siswa       Siswa[]
+}
+model User{
+  id_user      Int  @id @default(autoincrement())
+  username     String
+  name         String?
+  siswa        Siswa?
+  admin        Admin?
+}
+
+model Siswa{
+  id_siswa      Int  @id @default(autoincrement())
+  id_user       Int      @unique
+  id_kelas      Int?
+  user          User?       @relation(fields: [id_user], references: [id_user])
+  kelas         Kelas?      @relation(fields: [id_kelas], references: [id_kelas])
+  pelanggaran   Pelanggaran[]
+}
+
+model Admin{
+  id_admin      Int  @id @default(autoincrement())
+  id_user       Int      @unique
+  tingkat       String      
+  user          User?       @relation(fields: [id_user], references: [id_user])
+  pelanggaran   Pelanggaran[]
+}
+
+model Kontrak{
+  id_kontrak        Int  @id @default(autoincrement())
+  nama_pelanggaran  String
+  poin              Int
+  pelanggaran   Pelanggaran[]
+}
+
+model Pelanggaran{
+  id_pelanggaran  Int       @id @default(autoincrement())
+  id_siswa        Int  
+  id_admin        Int  
+  id_kontrak      Int  
+  bukti_foto      String 
+  status          Int       @db.SmallInt
+  siswa           Siswa     @relation(fields: [id_siswa], references: [id_siswa])
+  admin           Admin     @relation(fields: [id_admin], references: [id_admin])
+  kontrak         Kontrak   @relation(fields: [id_kontrak], references: [id_kontrak])
+}
